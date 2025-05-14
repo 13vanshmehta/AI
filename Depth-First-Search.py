@@ -1,45 +1,58 @@
 from collections import defaultdict
 
-class Graph:
+class Tree:
     def __init__(self):
-        # Default dictionary to store the graph
         self.graph = defaultdict(list)
     
-    # Function to add an edge to the graph
     def add_edge(self, u, v):
         self.graph[u].append(v)
+        self.graph[v].append(u)
     
-    # Function to perform DFS traversal from a given source vertex
-    def dfs_util(self, vertex, visited):
-        # Mark the current node as visited and print it
-        visited.add(vertex)
-        print(vertex, end=" ")
+    def dfs(self, start_node):
+        if start_node not in self.graph:
+            return f"Node {start_node} not found in the tree"
         
-        # Recur for all the adjacent vertices
-        for neighbor in self.graph[vertex]:
-            if neighbor not in visited:
-                self.dfs_util(neighbor, visited)
-    
-    # Function to perform DFS traversal
-    def dfs(self, start_vertex):
-        # Mark all vertices as not visited
         visited = set()
+        result = []
         
-        # Call the recursive helper function
-        self.dfs_util(start_vertex, visited)
+        def dfs_util(node):
+            visited.add(node)
+            result.append(node)
+            
+            for neighbor in self.graph[node]:
+                if neighbor not in visited:
+                    dfs_util(neighbor)
+        
+        dfs_util(start_node)
+        return result
 
-# Main function
+def main():
+    tree = Tree()
+    
+    print("DFS Implementation")
+    
+    try:
+        n = int(input("Number of edges: "))
+        
+        print("\nEnter edges (format: 'node1 node2'):")
+        for i in range(n):
+            edge = input(f"Edge {i+1}: ").split()
+            if len(edge) == 2:
+                u, v = edge
+                tree.add_edge(u, v)
+        
+        start = input("\nStarting node: ")
+        result = tree.dfs(start)
+        
+        if isinstance(result, list):
+            print("\nDFS Traversal:", " -> ".join(result))
+        else:
+            print("\nError:", result)
+            
+    except ValueError:
+        print("Invalid input.")
+    except Exception as e:
+        print(f"Error: {e}")
+
 if __name__ == "__main__":
-    g = Graph()
-
-    num_edges = int(input("Enter the number of edges: "))
-    
-    print("Enter edges (format: source destination):")
-    for i in range(num_edges):
-        u, v = map(int, input().split())
-        g.add_edge(u, v)
-
-    start = int(input("Enter the starting vertex for DFS: "))
-    
-    print(f"Depth First Traversal (starting from vertex {start}): ")
-    g.dfs(start)
+    main()

@@ -1,51 +1,64 @@
 from collections import defaultdict, deque
 
-class Graph:
+class Tree:
     def __init__(self):
-        # Default dictionary to store the graph
         self.graph = defaultdict(list)
     
-    # Function to add an edge to the graph
     def add_edge(self, u, v):
         self.graph[u].append(v)
+        self.graph[v].append(u)
     
-    # Function to perform BFS traversal from a given source vertex
-    def bfs(self, start_vertex):
-        # Mark all vertices as not visited
+    def bfs(self, start_node):
+        if start_node not in self.graph:
+            return f"Node {start_node} not found in the tree"
+        
         visited = set()
         
-        # Create a queue for BFS
-        queue = deque()
+        queue = deque([start_node])
+        visited.add(start_node)
         
-        # Mark the source node as visited and enqueue it
-        visited.add(start_vertex)
-        queue.append(start_vertex)
+        bfs_traversal = []
         
         while queue:
-            # Dequeue a vertex from queue and print it
-            vertex = queue.popleft()
-            print(vertex, end=" ")
+            current = queue.popleft()
+            bfs_traversal.append(current)
             
-            # Get all adjacent vertices of the dequeued vertex
-            # If an adjacent vertex has not been visited, mark it
-            # visited and enqueue it
-            for neighbor in self.graph[vertex]:
+            for neighbor in self.graph[current]:
                 if neighbor not in visited:
                     visited.add(neighbor)
                     queue.append(neighbor)
+        
+        return bfs_traversal
 
-# Main function
+def main():
+    tree = Tree()
+    
+    print("Breadth-First Search (BFS) Implementation: ")
+    try:
+        n = int(input("Enter the number of edges in the tree: "))
+        
+        print("\nEnter the edges (format: 'node1 node2'):")
+        for i in range(n):
+            edge = input(f"Edge {i+1}: ").strip().split()
+            if len(edge) != 2:
+                print("Invalid input format. Please enter two nodes separated by space.")
+                continue
+            u, v = edge
+            tree.add_edge(u, v)
+        
+        start_node = input("\nEnter the starting node for BFS: ").strip()
+        
+        result = tree.bfs(start_node)
+        
+        if isinstance(result, list):
+            print("\nBFS Traversal:", " -> ".join(result))
+        else:
+            print("\nError:", result)
+            
+    except ValueError:
+        print("Please enter a valid number.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 if __name__ == "__main__":
-    g = Graph()
-
-    num_edges = int(input("Enter the number of edges: "))
-    
-    print("Enter edges (format: source destination):")
-    for i in range(num_edges):
-        u, v = map(int, input().split())
-        g.add_edge(u, v)
-
-    start = int(input("Enter the starting vertex for BFS: "))
-    
-    print(f"Breadth First Traversal (starting from vertex {start}):")
-    g.bfs(start)
+    main()
