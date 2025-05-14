@@ -1,55 +1,21 @@
-def input_tree():
-    tree = {}
-    n = int(input("Enter the number of nodes in the tree: "))
-    
-    print("Enter the tree structure:")
-    for _ in range(n):
-        node = input("Enter node label: ")
-        children = input(f"Enter children of node '{node}' (comma separated, leave empty if leaf): ").split(',')
-        tree[node] = [child.strip() for child in children if child.strip()]
-    
-    return tree
+def minimax(depth, node_index, is_max, scores, height):
+    # If we’ve reached the bottom of the tree
+    if depth == height:
+        return scores[node_index]
 
-# Function to assign values to leaf nodes
-def assign_leaf_values(tree):
-    values = {}
-    print("\nEnter values for leaf nodes:")
-    for node in tree:
-        if not tree[node]:  # If the node has no children
-            val = int(input(f"Value for leaf node '{node}': "))
-            values[node] = val
-    return values
-
-# Minimax function with path tracking
-def min_max(node, is_maximizing):
-    if node not in tree or not tree[node]:  # Base case: leaf node
-        return values[node], [node]
-
-    if is_maximizing:
-        best_value = float('-inf')
-        best_path = []
-        for child in tree[node]:
-            val, path = min_max(child, False)
-            if val > best_value:
-                best_value = val
-                best_path = [node] + path
-        return best_value, best_path
+    if is_max:
+        return max(
+            minimax(depth + 1, node_index * 2, False, scores, height),
+            minimax(depth + 1, node_index * 2 + 1, False, scores, height)
+        )
     else:
-        best_value = float('inf')
-        best_path = []
-        for child in tree[node]:
-            val, path = min_max(child, True)
-            if val < best_value:
-                best_value = val
-                best_path = [node] + path
-        return best_value, best_path
+        return min(
+            minimax(depth + 1, node_index * 2, True, scores, height),
+            minimax(depth + 1, node_index * 2 + 1, True, scores, height)
+        )
 
+# Example scores at leaf nodes
+scores = [3, 5, 2, 9, 0, -1, 7, 4]
+height = 3  # Tree depth
 
-# Main Execution
-tree = input_tree()
-values = assign_leaf_values(tree)
-root = input("\nEnter the root node: ")
-
-result_value, result_path = min_max(root, True)
-print(f"\nBest value: {result_value}")
-print(f"Best path: {' -> '.join(result_path)}")
+print("Optimal value is:", minimax(0, 0, True, scores, height))
