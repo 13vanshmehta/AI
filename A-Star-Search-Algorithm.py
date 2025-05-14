@@ -1,66 +1,82 @@
-import heapq
+class Node:
+    def __init__(self, name, cost=0, heuristic=0):
+        self.name = name
+        self.cost = cost
+        self.heuristic = heuristic
+        self.f = cost + heuristic  # Total cost
 
-def input_weighted_tree():
-    tree = {}
-    n = int(input("Enter number of nodes in the tree: "))
-    print("For each node, enter children in format: child:cost (comma-separated), or leave blank if none.")
-    for _ in range(n):
-        node = input("Node: ")
-        children_input = input(f"Children of {node}: ")
-        children = []
-        if children_input:
-            for child_pair in children_input.split(','):
-                child, cost = child_pair.strip().split(':')
-                children.append((child.strip(), int(cost)))
-        tree[node] = children
-    return tree
-
-def heuristic(a, b):
-    # Simple heuristic: difference of ASCII values
-    return abs(ord(a) - ord(b))
-
-def a_star(tree, start, goal):
-    open_list = []
-    heapq.heappush(open_list, (0, start))
-
-    g_scores = {node: float('inf') for node in tree}
-    g_scores[start] = 0
-
-    f_scores = {node: float('inf') for node in tree}
-    f_scores[start] = heuristic(start, goal)
-
+def a_star(start, goal, graph, heuristic):
+    open_set = []
+    closed_set = set()
+    
+    start_node = Node(start, 0, heuristic[start])
+    open_set.append(start_node)
+    
     came_from = {}
+    g_score = {node: float('inf') for node in graph}
+    g_score[start] = 0
+    
+    while open_set:
+        # Find the node in open_set with the lowest f value
+        current = min(open_set, key=lambda node: node.f)
+        open_set.remove(current)
+        
+        if current.name == goal:
+            return reconstruct_path(came_from, current.name), g_score[goal]  # Return path and cost
+        
+        closed_set.add(current.name)
+        
+        for neighbor, cost in graph[current.name].items():
+            if neighbor in closed_set:
+                continue
+            
+            tentative_g_score = g_score[current.name] + cost
+            
+            if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current.name
+                g_score[neighbor] = tentative_g_score
+                f_score = tentative_g_score + heuristic[neighbor]
+                
+                # Check if the neighbor is already in the open set
+                if not any(node.name == neighbor for node in open_set):
+                    open_set.append(Node(neighbor, tentative_g_score, heuristic[neighbor]))
+    
+    return None, None  # Path not found
 
-    while open_list:
-        _, current = heapq.heappop(open_list)
+def reconstruct_path(came_from, current):
+    total_path = [current]
+    while current in came_from:
+        current = came_from[current]
+        total_path.append(current)
+    return total_path[::-1]  # Return reversed path
 
-        if current == goal:
-            path = []
-            while current in came_from:
-                path.append(current)
-                current = came_from[current]
-            path.append(start)
-            return path[::-1]
 
-        for neighbor, cost in tree.get(current, []):
-            tentative_g_score = g_scores[current] + cost
+# Input graph
+graph = {}
+heuristic = {}
 
-            if tentative_g_score < g_scores[neighbor]:
-                came_from[neighbor] = current
-                g_scores[neighbor] = tentative_g_score
-                f_scores[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-                heapq.heappush(open_list, (f_scores[neighbor], neighbor))
+n = int(input("Enter the number of nodes: "))
 
-    return None
+for _ in range(n):
+    node = input("Enter node name: ")
+    graph[node] = {}
+    heuristic[node] = int(input(f"Enter heuristic value for node {node}: "))
 
-# Run the code
-if __name__ == "__main__":
-    tree = input_weighted_tree()
-    start = input("Enter start node: ")
-    goal = input("Enter goal node: ")
+m = int(input("Enter the number of edges: "))
 
-    path = a_star(tree, start, goal)
-    if path:
-        print("A* Path:", " -> ".join(path))
-    else:
-        print("No path found.")
+for _ in range(m):
+    edge = input("Enter edge (format: node1 node2 cost): ").split()
+    node1, node2, cost = edge[0], edge[1], int(edge[2])
+    graph[node1][node2] = cost
+    graph[node2][node1] = cost  # Assuming undirected graph
+
+start = input("Enter the start node: ")
+goal = input("Enter the goal node: ")
+
+path, total_cost = a_star(start, goal, graph, heuristic)
+
+if path:
+    print("Path found:", " -> ".join(path))
+    print("Total cost:", total_cost)
+else:
+    print("No path found.")
