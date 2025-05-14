@@ -32,13 +32,11 @@ class Tree:
 
 def main():
     tree = Tree()
-    
-    print("Breadth-First Search (BFS) Implementation: ")
     try:
         n = int(input("Enter the number of edges in the tree: "))
         
         print("\nEnter the edges (format: 'node1 node2'):")
-        for i in range(n):
+        for i in range(n-1):
             edge = input(f"Edge {i+1}: ").strip().split()
             if len(edge) != 2:
                 print("Invalid input format. Please enter two nodes separated by space.")

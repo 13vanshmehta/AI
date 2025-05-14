@@ -18,15 +18,17 @@ def input_tree():
     return tree
 
 
-"""def print_tree(tree, node, level=0):
+def print_tree(tree, node, level=0):
     print(' ' * level + node)
     for child in tree.get(node, []):
         print_tree(tree, child, level + 2)
+        
 def main():
     tree = input_tree()
     root = input("Enter the root node: ").strip()
     
     print("\nTree structure:")
     print_tree(tree, root)
+
 if __name__ == "__main__":
-    main()"""
+    main()

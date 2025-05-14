@@ -27,10 +27,7 @@ class Tree:
         return result
 
 def main():
-    tree = Tree()
-    
-    print("DFS Implementation")
-    
+    tree = Tree()    
     try:
         n = int(input("Number of edges: "))
         

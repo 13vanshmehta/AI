@@ -38,8 +38,6 @@ def postorder(root):
     return result
 
 def build_tree():
-    print("Building a binary tree")
-    
     # Get number of nodes
     while True:
         try:
@@ -55,7 +53,7 @@ def build_tree():
     
     print("\nEnter node pairs (format: 'node1 node2'):")
     
-    for i in range(n):
+    for i in range(n-1):
         pair = input(f"Edge {i+1}: ").strip().split()
         
         if len(pair) != 2:
@@ -88,9 +86,7 @@ def build_tree():
     
     return root
 
-def main():
-    print("Binary Tree Traversal Implementation")
-    
+def main():    
     # Build tree from user input
     root = build_tree()
     
